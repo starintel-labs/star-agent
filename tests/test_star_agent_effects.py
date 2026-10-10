@@ -6,7 +6,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from star_agent import effects
 
@@ -121,6 +121,48 @@ class StarAgentEffectsTests(unittest.TestCase):
         self.assertEqual(effects.execute("osint_run", {
             "tool": "dns", "target": "example.org; echo bad",
         })["code"], "invalid_domain")
+
+
+    def test_starintel_search_uses_discovered_registry_get(self):
+        from types import ModuleType
+
+        class FakeManifest:
+            def has_operation(self, name):
+                return name == "documents.search"
+
+            def operation(self, name):
+                return SimpleNamespace(method="GET", path="/api/v1/documents/search")
+
+        class FakeClient:
+            def __init__(self, *args, **kwargs):
+                pass
+
+            def discover(self):
+                return FakeManifest()
+
+        client_module = ModuleType("starintel_client")
+        client_module.StarIntelClient = FakeClient
+        httpx_module = ModuleType("httpx")
+        get = Mock(return_value=SimpleNamespace(
+            raise_for_status=lambda: None,
+            json=lambda: {"hits": [{"id": "synthetic"}]},
+        ))
+        httpx_module.get = get
+        with patch.dict(os.environ, {
+            "STAR_AGENT_SERVER_URL": "http://127.0.0.1:5000",
+            "STARINTEL_API_KEY": "synthetic-test-token",
+        }):
+            with patch.dict("sys.modules", {
+                "starintel_client": client_module, "httpx": httpx_module,
+            }):
+                result = effects.intel_search({"query": "fixture"})
+        self.assertEqual(result["operation"], "documents.search")
+        self.assertEqual(
+            get.call_args.args[0],
+            "http://127.0.0.1:5000/api/v1/documents/search",
+        )
+        self.assertEqual(get.call_args.kwargs["params"]["q"], "fixture")
+        self.assertFalse(get.call_args.kwargs["follow_redirects"])
 
 
 if __name__ == "__main__":
