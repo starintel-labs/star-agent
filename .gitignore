@@ -9,3 +9,7 @@ __pycache__/
 .env
 .env.*
 !.env.example
+
+.deps/
+.star-agent/
+.venv/
