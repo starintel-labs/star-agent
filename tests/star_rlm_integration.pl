@@ -1,5 +1,7 @@
 :- begin_tests(star_rlm_integration).
 
+:- use_module(library(http/json)).
+
 :- use_module('../prolog/star_agent_direct').
 :- use_module('../prolog/star_agent_kb').
 
