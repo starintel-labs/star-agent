@@ -1,5 +1,137 @@
-#+title: RAGE Research Template
-#+description: Reusable Org-roam research, design, implementation, and verification control plane.
+#+title: Star-Agent
+#+description: Star-KB symbolic intelligence REPL; prolog-rlm native-tool direct mode on demand.
+
+* Star-Agent
+
+Star-KB is the *only symbolic intelligence authority* for this product. The
+default REPL uses SWI-Prolog and calls the installed =starintel-labs/star-kb=
+reasoning modules on a trusted generated StarIntel projection. It does not
+invent its own knowledge base or start an LLM. The optional =direct= mode loads
+the actual =lost-rob0t/prolog-rlm= tool-registered model runtime on demand.
+
+** Quick start
+
+The locked Nix producer exports ~default~/~star-agent~ packages and apps for
+~x86_64-linux~. It consumes Star-KB #25's installed rules and the existing
+prolog-rlm package at immutable revisions, preserving their review holds.
+The installed launcher closes SWI, Python, DNS/WHOIS/subfinder tools and CA
+dependencies and runs outside a checkout. Subfinder remains opt-in; actor
+executables remain discovered from operator-provided manifests. Credentials
+and a trusted ~STAR_KB_PROJECTION~ path are operator runtime configuration,
+never Nix expression values. Symbolic help/status need no model or secrets:
+
+#+begin_src sh
+nix run .#star-agent -- --command help
+nix run .#default -- --command status
+nix flake check --no-update-lock-file -L
+#+end_src
+
+The locked check reuses Python/SWI/RAGE tests, actual packaged Star-KB reasoning
+and registered prolog-rlm tools with synthetic data and a fake model. Installed
+help/status, a real symbolic query, and interactive startup/EOF are checked
+outside the source tree. Downstream suites pin this producer instead of copying
+its implementation. Hosted exact-head results are the platform evidence.
+
+Requirements: SWI-Prolog and Python 3.12+. For real symbolic graph operations,
+configure the Star-KB checkout and a generated, trusted projection:
+
+#+begin_src sh
+export STAR_KB_ROOT="$HOME/git/star-kb"
+export STAR_KB_PROJECTION="$HOME/.starintel/projections/current.pl"
+# Generate this projection through Star-KB's own projector from canonical
+# StarIntel JSON using your *verified current* release manifest.
+# "$STAR_KB_ROOT/tools/prolog-star-kb" project corpus.ndjson \
+#   --manifest /path/to/current-manifest.json -o "$STAR_KB_PROJECTION"
+sh bin/star-agent
+sh bin/star-agent --command "kb neighbors starintel:device:radio-1"
+sh bin/star-agent --command "analyze starintel:device:radio-1"
+#+end_src
+
+The bounded symbolic vocabulary includes =kb document=, =neighbors=, =path=,
+=explain=, =timeline=, =sources=, =contradictions=, =packet=, =analyze=,
+=compare=, =why-not=, =referrers= and =values=. These dispatch to Star-KB's
+exported semantic predicates. =analyze= returns a source/evidence packet and
+possible next review action, not a fabricated truth claim. No arbitrary Prolog
+goal syntax is accepted. Unsupported unstructured symbolic input fails clearly.
+
+** Search, web exploration, and real actors
+
+#+begin_src sh
+export STAR_AGENT_SEARXNG_URL="http://127.0.0.1:8080"
+sh bin/star-agent --command "search wifi wardriving"
+sh bin/star-agent --command "web https://example.org"
+sh bin/star-agent --command "explore https://example.org"
+
+# Server and pro-actors provide real contracted operations:
+export STAR_AGENT_SERVER_URL="http://127.0.0.1:5000"
+# STARINTEL_API_KEY is optional, supplied by env/keyring/auth-source.
+sh bin/star-agent --command "actors"
+sh bin/star-agent --command "intel index terms"
+sh bin/star-agent --command "target reddit r/example --dataset demo"
+
+# Only explicitly allowlisted domain tools are callable.
+export STAR_AGENT_OSINT_TOOLS="dns,whois,subfinder"
+sh bin/star-agent --command "osint dns example.org"
+#+end_src
+
+StarIntel search resolves the server's =documents.search= operation from
+=/client-manifest.json= and =/openapi.json= rather than inventing an endpoint.
+It requires =starintel-client=. Target creation uses the verified installed
+pro-actors manifest and its exact =sa-<actor>= CLI, with a deterministic
+idempotency key. A submission receipt does *not* assert the actor completed.
+=starintel-web= / =sa-web= handle more sophisticated browser collection.
+Web exploration here is bounded same-origin public HTTP text gathering, not a
+general browser automation engine.
+
+** Optional direct mode: the real prolog-rlm
+
+#+begin_src sh
+export PROLOG_RLM_ROOT="$HOME/git/prolog-rlm"
+export STAR_AGENT_RLM_MODEL="openrouter/free"
+# Provide OPENROUTER_API_KEY via environment or OS keyring.
+sh bin/star-agent --mode direct --command "ask Find and explain evidence"
+
+# Or use a configured local OpenAI-compatible provider:
+# export STAR_AGENT_RLM_ENDPOINT="http://127.0.0.1:1234/v1/chat/completions"
+# export STAR_AGENT_RLM_MODEL="local/model"
+#+end_src
+
+The REPL mode switch is =mode symbolic= / =mode direct=. The model sees only
+registered and capability-granted tools; the Star-KB query handler is shared
+between symbolic and direct modes. Direct mode is opt-in and never a hidden
+fallback for unsupported symbolic questions.
+
+Read tools are granted in direct mode by default. To enable a model to
+*request* targets or OSINT effects, both =STAR_AGENT_RLM_EFFECT_STORE= (a real
+prolog-rlm durable effect journal) and =STAR_AGENT_DIRECT_EFFECTS=1= are needed.
+The default =approve_diff= authority still requires approval via
+=approvals=, =approve ID= or =deny ID=. No shell tool is exposed.
+
+** Scope and limitations
+
+This delivers a real named-capability REPL and integration adapters, not a
+general natural-language symbolic intelligence system: Star-KB currently
+provides bounded graph/provenance reasoning; learned rules, Aleph,
+reward maximizers and natural-language intent expansion must be implemented in
+their Star-KB owner and surfaced via stable predicates. Missing facts never
+imply falsehood. An old Star-KB default manifest must not override the current
+StarIntel release/profile/schema lock (0.10.1 is the current server lock observed
+in this development pass). Do not mint new document fields or specs locally.
+No credential storage, crawler daemon, independent scheduler, or arbitrary
+process/Prolog execution is implemented.
+
+* Validation
+
+#+begin_src sh
+python3 -m unittest discover -s tests -p 'test_*.py' -v
+swipl -q -s tests/star_agent_plunit.pl -g "run_tests,halt(0)" -t "halt(1)"
+# With actual pinned Star-KB and prolog-rlm checkouts:
+swipl -q -s tests/star_kb_integration.pl -g "run_tests,halt(0)" -t "halt(1)"
+swipl -q -s tests/star_rlm_integration.pl -g "run_tests,halt(0)" -t "halt(1)"
+python3 scripts/sync.py
+python3 scripts/sync.py --check
+python3 scripts/validate-docs.py
+#+end_src
 
 * RAGE
 
@@ -74,7 +206,7 @@ Substantive Org documents carry a stable ID, title, description, status, file ta
 
 Do not load the entire corpus into an agent context for ordinary focused work. Load the active note, direct links, relevant index, source, and tests. Repository-wide audits are the exception.
 
-* Template use
+* Template provenance and maintenance
 
 When creating a new repository from this template:
 

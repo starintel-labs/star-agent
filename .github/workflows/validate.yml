@@ -8,6 +8,21 @@ permissions:
   contents: read
 
 jobs:
+  nix:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: cachix/install-nix-action@v31
+      - run: nix flake check --no-update-lock-file -L
+      - name: Run installed symbolic app outside checkout
+        run: |
+          source_root=$PWD
+          nix build --no-update-lock-file
+          cd "$RUNNER_TEMP"
+          nix run --no-update-lock-file "$source_root#default" -- --command help
+          nix run --no-update-lock-file "$source_root#star-agent" -- --command status
   rage:
     runs-on: ubuntu-latest
     steps:
@@ -15,10 +30,43 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.x'
+      - name: Install SWI-Prolog
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y swi-prolog-nox
+      - name: Checkout pinned Star-KB
+        uses: actions/checkout@v4
+        with:
+          repository: starintel-labs/star-kb
+          ref: fa1ed67e1dae8d790b1e6cef1b06c034e5cfa1fc
+          path: .deps/star-kb
+      - name: Checkout pinned prolog-rlm
+        uses: actions/checkout@v4
+        with:
+          repository: lost-rob0t/prolog-rlm
+          ref: 2596e3f7155a543026adde461a11326c60e1a756
+          path: .deps/prolog-rlm
       - name: Compile scripts
         run: python3 -m py_compile scripts/*.py
       - name: Unit tests
         run: python3 -m unittest discover -s tests -p 'test_*.py' -v
+      - name: SWI-Prolog REPL command tests
+        run: swipl -q -s tests/star_agent_plunit.pl -g "run_tests,halt(0)" -t "halt(1)"
+      - name: Real Star-KB integration
+        env:
+          STAR_KB_ROOT: ${{ github.workspace }}/.deps/star-kb
+          STAR_KB_PROJECTION: ${{ github.workspace }}/tests/fixtures/star_kb_projection.pl
+        run: swipl -q -s tests/star_kb_integration.pl -g "run_tests,halt(0)" -t "halt(1)"
+      - name: Real prolog-rlm registered tool integration
+        env:
+          STAR_KB_ROOT: ${{ github.workspace }}/.deps/star-kb
+          STAR_KB_PROJECTION: ${{ github.workspace }}/tests/fixtures/star_kb_projection.pl
+          PROLOG_RLM_ROOT: ${{ github.workspace }}/.deps/prolog-rlm
+        run: swipl -q -s tests/star_rlm_integration.pl -g "run_tests,halt(0)" -t "halt(1)"
+      - name: Offline executable REPL smoke
+        run: |
+          sh bin/star-agent --command help
+          sh bin/star-agent --command status
       - name: Synchronize structure
         run: python3 scripts/sync.py
       - name: Check synchronization

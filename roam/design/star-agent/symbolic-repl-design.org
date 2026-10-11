@@ -1,0 +1,93 @@
+#+title: Star-Agent REPL, Star-KB binding and prolog-rlm direct adapter
+#+description: Bounded implementation design for offline symbolic intelligence and opt-in model-native registered tools.
+#+status: proposed
+#+filetags: :star-agent:design:repl:star-kb:direct:
+:PROPERTIES:
+:ID: star-agent-symbolic-repl-design
+:END:
+
+* Design intent
+
+Implement the user-requested REPL without inventing an alternative StarIntel
+symbolic AI. The executable composition is:
+
+#+begin_src text
+operator input
+    |
+    v
+Star-Agent SWI-Prolog REPL / fixed command grammar
+    |
+    +--> Star-KB named exported predicates (symbolic, default)
+    |          |
+    |          +--> trusted canonical projection / provenance
+    |
+    +--> Python typed side-effect port
+    |          +--> SearXNG + bounded public HTTP
+    |          +--> starintel-client discovered documents.search
+    |          +--> verified pro-actors sa-* CLI -> targets.create
+    |          +--> allowlisted dig / whois / subfinder
+    |
+    +--> prolog-rlm rlm_direct/4 (explicit direct mode)
+                   +--> same Star-KB / effect ports through
+                        registered RLM tools and authority/effect checks
+#+end_src
+
+The REPL owns **only command syntax and named adapter bindings**.
+Symbolic claim semantics and graph traversal come from Star-KB. Model data is
+never parsed as Prolog source nor converted to host callables. Unknown symbolic
+intents fail without an LLM fallback. Every external operation has bounded
+input/output, timeouts, structured success/failure and a named capability.
+
+* Approval Table
+
+| Approval area | Required authority | State | Evidence required | Evidence reference |
+|---------------+--------------------+-------+-------------------+--------------------|
+| Research | Project owner | PENDING | Review input research and affected contracts | [[id:star-agent-symbolic-repl-research][Research]] |
+| Design | Project owner | PENDING | Accept adapter boundaries and supported command vocabulary | this note |
+| Execution | Project owner | APPROVED | Explicit directive to build the real agent and use Star-KB + prolog-rlm direct | 2026-10-10 chat |
+| Source verification | Maintainer | APPROVED | Pinned real Star-KB/RLM, adversarial adapters and installed package tests | [[https://github.com/starintel-labs/star-agent/actions/runs/38111147270][Exact runtime head 3268852 CI]] |
+| Source merge | Project owner | APPROVED | Bounded backlog source merge, superseding the earlier draft hold | [[https://github.com/starintel-labs/star-agent/pull/4][2026-10-11 merge authorization and current-head gates]] |
+| Deployment verification | Operator | PENDING | Explicit deployment scope and actual authorized service/provider checks | No deployment or live-provider success claimed |
+
+* APIs and safety invariants
+
+- =prolog/star_agent_kb.pl= calls =star_reasoning:tool_*= for named operations and loads a trusted projection through =star_json:load_projection/1=. No general evaluation endpoint.
+- =prolog/star_agent_commands.pl= parses REPL intents but contains no competing ontology or inference engine.
+- =prolog/star_agent_direct.pl= lazily loads the real prolog-rlm runtime and registers the *same* Star-KB query via =rlm_tool:tool_register/4=.
+- =star_agent/effects.py= confines network and subprocess effects. User/model-provided bytes remain argument data, never executable process arguments choosing program names.
+- Star Server operations use discovered registry and authorized client/CLI surfaces. A receipt records submission, not completion. No new canonical document writer or schema modification.
+- Read capabilities are available in direct mode by default. Effectful model tools require explicit opt-in and the established prolog-rlm durable effect store; no =dangerous= mode is chosen by the adapter.
+- Private HTTP destinations, redirects to internal origins, and arbitrary command names are denied. No credential values enter generated files, traces, or version control.
+- Add SWI/Star-KB/RLM contract tests and Python offline adapter tests; do not claim live provider or deployed StarIntel end-to-end success from mocks.
+
+* Deferred implementation
+
+Star-KB human-feedback learning, reward maximizers, new symbolic planning
+predicates, autonomous recursive target generation, canonical fact promotion,
+long-running scheduling, browser interaction and hosted provider integration
+require separate owner-specification/contracts and end-to-end verification.
+These are *not* covertly reimplemented in Star-Agent.
+
+* Source merge decision
+
+The project owner authorized the bounded backlog source merge on 2026-10-11,
+superseding the earlier draft merge hold. This authorization is distinct from
+accepting broader research/design claims, whose detailed review rows remain
+pending. The runtime and pinned synthetic integration tests are unchanged from
+reviewed head =32688527dba2db793a27b9b54bf2cf57761fc33d=. A fresh exact-head CI
+run gates the documentation update. Operator deployment, live providers and
+external collection remain unexecuted and require their own authorization.
+
+* Footnotes and Glossary
+
+- *Adapter* -- glue translating a named external tool/command into the existing owner API.
+- *Capability* -- granted runtime tool permission, distinct from discovery and authority.
+- *Evidence packet* -- Star-KB bundle of bounded neighborhood, timeline, provenance and contradictions.
+- *Durable effect journal* -- prolog-rlm service ensuring repeated logical search does not blindly resubmit a remote side effect.
+
+* Changelog
+
+| Date | Change | Author or actor | Evidence |
+|------+--------+-----------------+----------|
+| 2026-10-10 | Proposed executable Star-KB-first REPL and direct-only prolog-rlm integration | ChatGPT | GitHub source inspection and user specification |
+| 2026-10-11 | Record approved bounded source merge and separate passing source checks from pending deployment verification | ChatGPT | PR #4 independent review and exact-head CI; project-owner backlog merge authorization |

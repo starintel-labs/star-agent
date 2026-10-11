@@ -1,0 +1,73 @@
+#+title: Star-Agent symbolic Star-KB REPL and direct-mode research
+#+description: Existing Star-KB, prolog-rlm, pro-actors, and server contracts governing a first executable Star-Agent product.
+#+status: proposed
+#+filetags: :star-agent:research:star-kb:prolog-rlm:actors:
+:PROPERTIES:
+:ID: star-agent-symbolic-repl-research
+:END:
+
+* Research scope
+
+The user requested a full real Star-Agent with a REPL for symbolic intelligence, targets, search, web exploration, OSINT tools and pro-actors. A subsequent correction specified that *the symbolic AI must be the existing StarIntel Star-KB*, and only the existing =prolog-rlm direct= runtime should supply the optional LLM agentic mode.
+
+* Approval Table
+
+| Approval area | Required authority | State | Evidence required | Evidence reference |
+|---------------+--------------------+-------+-------------------+--------------------|
+| Research | Project owner | PENDING | Review the integration boundaries and tested capabilities | 2026-10-10 request; this research note |
+| Design | Project owner | PENDING | Review the proposed REPL, Star-KB and direct-mode interfaces | [[id:star-agent-symbolic-repl-design][Design]] |
+| Execution | Project owner | APPROVED | Explicit instruction to implement executable agent in star-agent | 2026-10-10 user request |
+| Source verification | Maintainer | APPROVED | Pinned real Star-KB/RLM, adversarial adapters and installed package tests | [[https://github.com/starintel-labs/star-agent/actions/runs/38111147270][Exact runtime head 3268852 CI]] |
+| Source merge | Project owner | APPROVED | Bounded backlog source merge, superseding the earlier draft hold | [[https://github.com/starintel-labs/star-agent/pull/4][2026-10-11 merge authorization and current-head gates]] |
+| Deployment verification | Operator | PENDING | Explicit deployment scope and actual authorized service/provider checks | No deployment or live-provider success claimed |
+
+* Verified Facts
+
+- =star-agent= main initially contained the RAGE template, not an executable product. Inspected its tree and root =AGENTS.md= on 2026-10-10 through the GitHub connector.
+- [[https://github.com/starintel-labs/star-kb/blob/main/kb/core/star_reasoning.pl][Star-KB reasoning]] exports bounded graph neighbors, paths, document metadata, relation explanations, timelines, contradictions, comparison, evidence sources, reverse references and packets. Its lossless JSON facts live in the =star_json= projection module. It is the *symbolic source of semantics*, not the REPL parser.
+- [[https://github.com/lost-rob0t/prolog-rlm/blob/main/docs/direct-runtime.md][prolog-rlm direct]] exports =rlm_direct/4= and a registered-tool runtime with explicit capabilities, bounded futures, authority and an effect journal. Runtime core must remain generic.
+- [[https://github.com/lost-rob0t/starintel-pro-actors/blob/main/python/src/starintel_pro_actors/actor_cli.py][pro-actors]] exposes fixed per-actor =sa-*= commands and the =targets.create= contract. Its actor manifests advertise the installed command and service mode. Star Server—not the actor—owns scheduling and leases.
+- Star Server's maintained HTTP contract declares =documents.search= at =/api/v1/documents/search= with a required =q= query parameter, and a separate =public.search.get=. The current starintel-client =call()= has no query-param option; a discovered registry-backed GET can bridge this without a new legacy route.
+- Star Server's current canonical schema lock inspected 2026-10-10 resolves =release_version= and =schema_version= =0.10.1=. The Star-KB Python projector default in its inspected branch is older, so callers must pass an explicit pinned current release manifest.
+
+* Inference
+
+=star-agent= should own the operator experience and typed adapter ports only. Symbolic facts and proofs come from Star-KB; the direct model may request only host-registered tools, which use the same KB adapter. Named operations and capability validation prevent converting text into executable Prolog, shell or filesystem authority. The CLI should remain useful offline without a model, even when live StarIntel backend services are unconfigured.
+
+* Contradictions
+
+- Treating a Prolog command grammar as a new symbolic "AI engine" would duplicate Star-KB authority. Resolution: the grammar routes to a closed Star-KB query API and explicitly rejects unhandled natural language in symbolic mode.
+- The pro-actors manifest output observed in the upstream source can contain historical schema-version fields. It cannot establish authority over the 0.10.1 active lock; real canonical publishing must use the server's locked schema before writing.
+- User wishes broad OSINT access, while unrestricted shell and web egress would bypass RLM authority and allow private-network SSRF. Resolution: fixed command names, public HTTP destinations, manifest-bound actors and strict operator allowlists; advanced browser execution belongs to the existing web actor.
+- A completed target request is not the same as completed actor work. Only submission receipts may be claimed until downstream job observations arrive.
+
+* Unresolved Questions
+
+- Which Star-KB public rule modules should gain an explicit higher-level symbolic agent/goal-selection predicate in future revisions? The initial slice exposes existing supported predicates.
+- When will reward maximizers, Aleph and active learning be approved and merged in Star-KB so Star-Agent can expose them without duplicating semantics?
+- Does the deployed server's =documents.search= contract match the generated client manifest and authenticated tenant scope on the target environment?
+- Are non-default Prolog RLM providers configured, and does the operator want selected effectful tools in direct mode after a durable effect journal is available?
+
+* Source merge decision
+
+The project owner authorized the bounded backlog source merge on 2026-10-11,
+superseding the earlier draft merge hold. This authorization is distinct from
+accepting broader research/design claims, whose detailed review rows remain
+pending. The runtime and pinned synthetic integration tests are unchanged from
+reviewed head =32688527dba2db793a27b9b54bf2cf57761fc33d=. A fresh exact-head CI
+run gates the documentation update. Operator deployment, live providers and
+external collection remain unexecuted and require their own authorization.
+
+* Footnotes and Glossary
+
+- *Star-KB* -- the maintained semantic Prolog projection/query library, not a second Star-Agent database.
+- *Direct mode* -- prolog-rlm's bounded provider-native registered-tool loop, not a custom planner.
+- *Canonical StarIntel document* -- a versioned, validated record admitted by Star Server, not an inferred Prolog solution.
+- *Capability* -- a runtime check authorizing a specific named tool; schema registration alone does not grant invocation authority.
+
+* Changelog
+
+| Date | Change | Author or actor | Evidence |
+|------+--------+-----------------+----------|
+| 2026-10-10 | Recorded Star-KB symbolic REPL, real direct mode, targets/search/tool boundaries and verification risks | ChatGPT | Actual GitHub source files and user correction |
+| 2026-10-11 | Record approved bounded source merge and separate passing source checks from pending deployment verification | ChatGPT | PR #4 independent review and exact-head CI; project-owner backlog merge authorization |

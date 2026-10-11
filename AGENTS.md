@@ -103,3 +103,12 @@ python3 scripts/validate-docs.py
 ```
 
 Never claim a command passed unless it was executed and its result was observed. Never bypass a failing wrapper with a lower-level command just to obtain a green exit code.
+
+## Star-Agent runtime boundaries
+
+- **Star-KB is the symbolic intelligence**. No second ontology, separate graph store, or fabricated reasoning path in star-agent. Integrate through named exported predicates on a pinned projection.
+- Default REPL mode is symbolic and does not invoke LLMs implicitly. Optional direct mode reuses `prolog-rlm` native-tool runtime, budgets, capability/authority/effect rules; no invented second RLM scheduler.
+- External effects go through fixed, bounded, allowlisted adapters. No model-supplied Prolog goal, shell string, arbitrary actor binary, or private-target web URL.
+- Targets use manifest-discovered `sa-<actor>` and contracted StarIntel Server submission. Search uses discovered registry operations, never legacy hardcoded paths.
+- Candidate facts are not canonical truth, and no new schema fields may be introduced without versioned StarIntel specification authority.
+- CI must run live SWI-Prolog against pinned actual Star-KB and prolog-rlm modules, in addition to the existing RAGE validation.
