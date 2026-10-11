@@ -11,6 +11,27 @@ the actual =lost-rob0t/prolog-rlm= tool-registered model runtime on demand.
 
 ** Quick start
 
+The locked Nix producer exports ~default~/~star-agent~ packages and apps for
+~x86_64-linux~. It consumes Star-KB #25's installed rules and the existing
+prolog-rlm package at immutable revisions, preserving their review holds.
+The installed launcher closes SWI, Python, DNS/WHOIS/subfinder tools and CA
+dependencies and runs outside a checkout. Subfinder remains opt-in; actor
+executables remain discovered from operator-provided manifests. Credentials
+and a trusted ~STAR_KB_PROJECTION~ path are operator runtime configuration,
+never Nix expression values. Symbolic help/status need no model or secrets:
+
+#+begin_src sh
+nix run .#star-agent -- --command help
+nix run .#default -- --command status
+nix flake check --no-update-lock-file -L
+#+end_src
+
+The locked check reuses Python/SWI/RAGE tests, actual packaged Star-KB reasoning
+and registered prolog-rlm tools with synthetic data and a fake model. Installed
+help/status, a real symbolic query, and interactive startup/EOF are checked
+outside the source tree. Downstream suites pin this producer instead of copying
+its implementation. Hosted exact-head results are the platform evidence.
+
 Requirements: SWI-Prolog and Python 3.12+. For real symbolic graph operations,
 configure the Star-KB checkout and a generated, trusted projection:
 

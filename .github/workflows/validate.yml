@@ -8,6 +8,21 @@ permissions:
   contents: read
 
 jobs:
+  nix:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: cachix/install-nix-action@v31
+      - run: nix flake check --no-update-lock-file -L
+      - name: Run installed symbolic app outside checkout
+        run: |
+          source_root=$PWD
+          nix build --no-update-lock-file
+          cd "$RUNNER_TEMP"
+          nix run --no-update-lock-file "$source_root#default" -- --command help
+          nix run --no-update-lock-file "$source_root#star-agent" -- --command status
   rage:
     runs-on: ubuntu-latest
     steps:
