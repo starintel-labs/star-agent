@@ -17,7 +17,9 @@ The user requested a full real Star-Agent with a REPL for symbolic intelligence,
 | Research | Project owner | PENDING | Review the integration boundaries and tested capabilities | 2026-10-10 request; this research note |
 | Design | Project owner | PENDING | Review the proposed REPL, Star-KB and direct-mode interfaces | [[id:star-agent-symbolic-repl-design][Design]] |
 | Execution | Project owner | APPROVED | Explicit instruction to implement executable agent in star-agent | 2026-10-10 user request |
-| Verification | Maintainer | PENDING | Real Star-KB and RLM integration tests, exact-head CI | current feature PR |
+| Source verification | Maintainer | APPROVED | Pinned real Star-KB/RLM, adversarial adapters and installed package tests | [[https://github.com/starintel-labs/star-agent/actions/runs/38111147270][Exact runtime head 3268852 CI]] |
+| Source merge | Project owner | APPROVED | Bounded backlog source merge, superseding the earlier draft hold | [[https://github.com/starintel-labs/star-agent/pull/4][2026-10-11 merge authorization and current-head gates]] |
+| Deployment verification | Operator | PENDING | Explicit deployment scope and actual authorized service/provider checks | No deployment or live-provider success claimed |
 
 * Verified Facts
 
@@ -46,6 +48,16 @@ The user requested a full real Star-Agent with a REPL for symbolic intelligence,
 - Does the deployed server's =documents.search= contract match the generated client manifest and authenticated tenant scope on the target environment?
 - Are non-default Prolog RLM providers configured, and does the operator want selected effectful tools in direct mode after a durable effect journal is available?
 
+* Source merge decision
+
+The project owner authorized the bounded backlog source merge on 2026-10-11,
+superseding the earlier draft merge hold. This authorization is distinct from
+accepting broader research/design claims, whose detailed review rows remain
+pending. The runtime and pinned synthetic integration tests are unchanged from
+reviewed head =32688527dba2db793a27b9b54bf2cf57761fc33d=. A fresh exact-head CI
+run gates the documentation update. Operator deployment, live providers and
+external collection remain unexecuted and require their own authorization.
+
 * Footnotes and Glossary
 
 - *Star-KB* -- the maintained semantic Prolog projection/query library, not a second Star-Agent database.
@@ -58,3 +70,4 @@ The user requested a full real Star-Agent with a REPL for symbolic intelligence,
 | Date | Change | Author or actor | Evidence |
 |------+--------+-----------------+----------|
 | 2026-10-10 | Recorded Star-KB symbolic REPL, real direct mode, targets/search/tool boundaries and verification risks | ChatGPT | Actual GitHub source files and user correction |
+| 2026-10-11 | Record approved bounded source merge and separate passing source checks from pending deployment verification | ChatGPT | PR #4 independent review and exact-head CI; project-owner backlog merge authorization |

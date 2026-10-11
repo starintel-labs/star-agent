@@ -45,7 +45,9 @@ input/output, timeouts, structured success/failure and a named capability.
 | Research | Project owner | PENDING | Review input research and affected contracts | [[id:star-agent-symbolic-repl-research][Research]] |
 | Design | Project owner | PENDING | Accept adapter boundaries and supported command vocabulary | this note |
 | Execution | Project owner | APPROVED | Explicit directive to build the real agent and use Star-KB + prolog-rlm direct | 2026-10-10 chat |
-| Verification | Maintainer | PENDING | Exact-head CI with pinned real Star-KB/RLM and adversarial tests | GitHub PR |
+| Source verification | Maintainer | APPROVED | Pinned real Star-KB/RLM, adversarial adapters and installed package tests | [[https://github.com/starintel-labs/star-agent/actions/runs/38111147270][Exact runtime head 3268852 CI]] |
+| Source merge | Project owner | APPROVED | Bounded backlog source merge, superseding the earlier draft hold | [[https://github.com/starintel-labs/star-agent/pull/4][2026-10-11 merge authorization and current-head gates]] |
+| Deployment verification | Operator | PENDING | Explicit deployment scope and actual authorized service/provider checks | No deployment or live-provider success claimed |
 
 * APIs and safety invariants
 
@@ -66,6 +68,16 @@ long-running scheduling, browser interaction and hosted provider integration
 require separate owner-specification/contracts and end-to-end verification.
 These are *not* covertly reimplemented in Star-Agent.
 
+* Source merge decision
+
+The project owner authorized the bounded backlog source merge on 2026-10-11,
+superseding the earlier draft merge hold. This authorization is distinct from
+accepting broader research/design claims, whose detailed review rows remain
+pending. The runtime and pinned synthetic integration tests are unchanged from
+reviewed head =32688527dba2db793a27b9b54bf2cf57761fc33d=. A fresh exact-head CI
+run gates the documentation update. Operator deployment, live providers and
+external collection remain unexecuted and require their own authorization.
+
 * Footnotes and Glossary
 
 - *Adapter* -- glue translating a named external tool/command into the existing owner API.
@@ -78,3 +90,4 @@ These are *not* covertly reimplemented in Star-Agent.
 | Date | Change | Author or actor | Evidence |
 |------+--------+-----------------+----------|
 | 2026-10-10 | Proposed executable Star-KB-first REPL and direct-only prolog-rlm integration | ChatGPT | GitHub source inspection and user specification |
+| 2026-10-11 | Record approved bounded source merge and separate passing source checks from pending deployment verification | ChatGPT | PR #4 independent review and exact-head CI; project-owner backlog merge authorization |

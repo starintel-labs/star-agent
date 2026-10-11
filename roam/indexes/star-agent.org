@@ -34,7 +34,19 @@ collection. No competing rule engine or queue is introduced.
 | Research | Project owner | PENDING | Review linked research | symbolic-repl-research.org |
 | Design | Project owner | PENDING | Review linked design | symbolic-repl-design.org |
 | Execution | Project owner | APPROVED | Explicit user request to implement REPL and adapters | 2026-10-10 conversation |
-| Verification | Maintainer | PENDING | Exact-head CI and deployment tests | current draft PR |
+| Source verification | Maintainer | APPROVED | Pinned real Star-KB/RLM, adversarial adapters and installed package tests | [[https://github.com/starintel-labs/star-agent/actions/runs/38111147270][Exact runtime head 3268852 CI]] |
+| Source merge | Project owner | APPROVED | Bounded backlog source merge, superseding the earlier draft hold | [[https://github.com/starintel-labs/star-agent/pull/4][2026-10-11 merge authorization and current-head gates]] |
+| Deployment verification | Operator | PENDING | Explicit deployment scope and actual authorized service/provider checks | No deployment or live-provider success claimed |
+
+* Source merge decision
+
+The project owner authorized the bounded backlog source merge on 2026-10-11,
+superseding the earlier draft merge hold. This authorization is distinct from
+accepting broader research/design claims, whose detailed review rows remain
+pending. The runtime and pinned synthetic integration tests are unchanged from
+reviewed head =32688527dba2db793a27b9b54bf2cf57761fc33d=. A fresh exact-head CI
+run gates the documentation update. Operator deployment, live providers and
+external collection remain unexecuted and require their own authorization.
 
 * Footnotes and Glossary
 
@@ -45,3 +57,4 @@ collection. No competing rule engine or queue is introduced.
 | Date | Change | Author or actor | Evidence |
 |------+--------+-----------------+----------|
 | 2026-10-10 | Indexed the first real Star-KB REPL and direct-mode implementation | ChatGPT | Feature branch and upstream source audit |
+| 2026-10-11 | Record approved bounded source merge and separate passing source checks from pending deployment verification | ChatGPT | PR #4 independent review and exact-head CI; project-owner backlog merge authorization |
